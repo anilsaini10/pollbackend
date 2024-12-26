@@ -359,17 +359,19 @@ const addVote = async (req, res) => {
             return res.status(201).json({ status: 201, message: "Poll / comment already deleted or not exists !" });
         };
 
+        // getting all the options in currentOptions Variable
         let currentOptions = currentPoll?.options;
         const currentVoters = currentPoll?.voters;
-
+        
         const isVoterExists = currentVoters.filter(item => item?.id == userId);
         if (isVoterExists?.length > 0) {
             return res.status(201).json({ status: 201, message: "You already voted on this poll !", data: req.body });
         }
-
+        
         currentOptions[index].count = currentOptions[index].count + 1;
-        const totalVotes = currentPoll?.totalVotes;
 
+        const totalVotes = currentPoll?.totalVotes;
+ 
         const pollObj = {
             options: currentOptions,
             totalVotes: totalVotes + 1,
@@ -383,15 +385,10 @@ const addVote = async (req, res) => {
             date: date
         };
 
-
         currentPoll.options = currentOptions;
         currentPoll.totalVotes = totalVotes + 1;
         currentPoll?.voters?.push(voteObj);
-        console.log(pollObj);
-        console.log(voteObj);
-        console.log(currentOptions);
-        // return
-
+    
         const poll = await Poll.findByIdAndUpdate(pollId, { options: currentOptions, totalVotes: totalVotes + 1, $push: { voters: voteObj } }, { new: true });
         // await Poll.findByIdAndUpdate(pollId, { $push: { voters: voteObj } }, { new: true });
         res.status(200).json({ status: 200, message: "Vote added successfully !", data: currentPoll });
